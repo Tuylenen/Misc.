@@ -3,7 +3,6 @@ from ..target import Target
 
 from requests import get
 from bs4 import BeautifulSoup
-from html import unescape
 import re
 
 
@@ -17,7 +16,7 @@ Args:
     query: str or List([str]): query or queries (currently only exact search by word or phrase is available)
     numResults: int: number of results wanted (100 by default)
     kwic: boolean: kwic format (True) or a sentence (False) (True by default)
-    tag: boolean: whether to collect grammatical tags for target word or not (False by default, available only for corbama-net-non-tonal subcorpus)
+    tag: boolean: whether to collect grammatical tags for target word or not (True by default)
     
 Main function: extract
 Returns:
@@ -36,10 +35,6 @@ class PageParser(Container):
         super().__init__(*args,**kwargs)
         if self.subcorpus is None:
             self.subcorpus = 'kres'
-        if self.kwic:
-            self.__viewmode = 'kwic'
-        else:
-            self.__viewmode = 'sen'
             
         self.__page = None
         self.__pagenum = 1
@@ -50,13 +45,12 @@ class PageParser(Container):
             "corpname": self.subcorpus,
             "iquery": self.query,
             "fromp": self.__pagenum,
-            "viewmode": self.__viewmode
         }
         """
         create a query url and get results for one page
         """
         r = get('http://nl.ijs.si/noske/all.cgi/first', params)
-        return unescape(r.text)
+        return r.text
 
 
     def __parse_page(self):
